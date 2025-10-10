@@ -1,7 +1,8 @@
 🩺 **MedLink HealthCare — Smart Medical Assistant App**
 
 MedLink HealthCare is a modern Android application designed to help users to manage their medical life intelligently. It combines appointment scheduling, reminder management, and AI-driven health insights to keep users organized and motivated in maintaining a healthy lifestyle.
-<img width="700" height="704" alt="image" src="https://github.com/user-attachments/assets/e51c2c65-4aaf-4964-a886-1136489774c8" />
+
+<img width="600" height="500" alt="image" src="https://github.com/user-attachments/assets/e51c2c65-4aaf-4964-a886-1136489774c8" />
 
 🚀 **Key Features**
 🕒 **Smart Reminders:-**
