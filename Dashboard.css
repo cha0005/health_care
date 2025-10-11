@@ -1,0 +1,141 @@
+.dashboard-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #2c3e50;
+  color: white;
+}
+
+.dashboard-title {
+  font-size: 1.8rem;
+}
+
+.logout-button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout-button:hover {
+  background: #c0392b;
+}
+
+/* Main dashboard content */
+.dashboard-main {
+  background: white;
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  padding: 80px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.left-panel {
+  width: 350px;
+  align-self: left;
+}
+
+.profile-card {
+  background: linear-gradient(135deg, #33c55a, #adb0b1);
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  text-wrap: break-word;
+}
+
+.profile-picture {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  margin-bottom: 15px;
+}
+
+.edit-profile-btn {
+  background: #b60b7a;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.edit-profile-btn:hover {
+  background: #2980b9;
+}
+
+
+.right-panel {
+  flex: Center;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  margin-left: 120px;
+}
+
+.card-button {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+   white-space: normal;
+  word-wrap: break-word;
+  min-height: 40px;       
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+  font-size: 1.9rem;
+  font-weight: bold;
+  display:flex;
+  cursor: pointer;
+  justify-content: center;      
+  align-items: center;          
+  text-align: center;  
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card-button:hover {
+  transform: translateY(-10px);
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.profile-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.profile-edit-form label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 5%;
+}
+
+.profile-edit-form label input {
+  flex: 1;
+  margin-left: 10px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.save-btn {
+  padding: 8px 12px;
+  background-color: #2407ca;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.save-btn:hover {
+  background-color: #12069a;
+}
+
