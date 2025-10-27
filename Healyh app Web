@@ -1,0 +1,24 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import Login from "./pages/Login";
+import AdminRegister from "./pages/AdminRegister";
+import Dashboard from "./pages/Dashboard";
+import ManageUsers from "./pages/ManageUsers";
+import ManageAppointments from "./pages/ManageAppointments";
+import ViewPatientRecords from "./pages/ViewPatientRecords";
+
+export default function App() {
+  return (
+    <Router>
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/admin-register"element={<AdminRegister/>}/>
+      <Route path="/dashboard" element={<Dashboard />} />
+       <Route path="/manage-users" element={<ManageUsers />} />
+        <Route path="/manage-appointments" element={<ManageAppointments />} />
+        <Route path="/view-patient-records" element={<ViewPatientRecords />} />
+    </Routes>
+    </Router>
+  );
+}
+
