@@ -1,0 +1,116 @@
+import React, { useEffect, useState } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { mobileDb as db } from "../firebase/firebaseMobileConfig";
+import { useNavigate } from "react-router-dom";
+import "./ViewPatientRecords.css";
+import backgroundImage from "../assets/ref.jpg";
+
+export default function ViewPatientRecords() {
+  const [patients, setPatients] = useState([]);
+  const [filteredPatients, setFilteredPatients] = useState([]);
+  const [searchId, setSearchId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const usersSnapshot = await getDocs(collection(db, "Users"));
+        const userData = [];
+
+        for (const userDoc of usersSnapshot.docs) {
+          const user = { id: userDoc.id, ...userDoc.data() };
+          userData.push(user);
+        }
+
+        setPatients(userData);
+        setFilteredPatients(userData);
+      } catch (error) {
+        console.error("Error fetching patient records:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
+
+  const handleSearch = () => {
+    if (searchId.trim() === "") {
+      setFilteredPatients(patients);
+    } else {
+      const filtered = patients.filter((p) =>
+        p.id.toLowerCase().includes(searchId.toLowerCase())
+      );
+      setFilteredPatients(filtered);
+    }
+  };
+
+  if (loading) return <p className="loading">Loading patient records...</p>;
+
+  return (
+    <div
+      className="view-patient-container"
+      style={{
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Top Bar */}
+      <div className="top-bar">
+        <h2 className="title"> View Patient Records </h2>
+        <button className="back-btn" onClick={() => navigate("/dashboard")}>
+          Back to Dashboard
+        </button>
+      </div>
+
+      {/* Search Bar */}
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Enter Patient ID"
+          value={searchId}
+          onChange={(e) => setSearchId(e.target.value)}
+          className="search-input"
+        />
+        <button onClick={handleSearch} className="search-btn">
+          Search
+        </button>
+      </div>
+
+      {/* Table Section */}
+      <div className="table-wrapper">
+        {filteredPatients.length === 0 ? (
+          <p className="no-records">No patient records found.</p>
+        ) : (
+          <table className="patient-table">
+            <thead>
+              <tr>
+                <th>Patient ID</th>
+                <th>Full Name</th>
+                <th>Contact</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>NIC</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPatients.map((patient) => (
+                <tr key={patient.id}>
+                  <td>{patient.id}</td>
+                  <td>{patient.fullName}</td>
+                  <td>{patient.contact}</td>
+                  <td>{patient.email}</td>
+                  <td>{patient.address}</td>
+                  <td>{patient.nic}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
