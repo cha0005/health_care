@@ -1,0 +1,136 @@
+import React, { useState, useEffect } from "react";
+import "./ManageAppointments.css";
+import { mobileDb as db } from "../firebase/firebaseMobileConfig";
+import { collection, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import backgroundImage from "../assets/ref.jpg";
+
+export default function ManageAppointments() {
+  const [appointments, setAppointments] = useState([]);
+  const [searchId, setSearchId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const navigate = useNavigate();
+
+  const fetchAppointments = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const appointmentsRef = collection(db, "Appointments");
+      const snapshot = await getDocs(appointmentsRef);
+
+      let appointmentList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      if (searchId.trim() !== "") {
+        appointmentList = appointmentList.filter((appt) =>
+          appt.id.toLowerCase().includes(searchId.trim().toLowerCase())
+        );
+      }
+
+      setAppointments(appointmentList);
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+      setError("Failed to load appointments. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    fetchAppointments();
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "N/A";
+    try {
+      if (timestamp.toDate) return timestamp.toDate().toLocaleString();
+      if (typeof timestamp === "string") return new Date(timestamp).toLocaleString();
+      return String(timestamp);
+    } catch {
+      return "Invalid date";
+    }
+  };
+
+  return (
+    <div className="page-container">
+      {/* Top Bar */}
+      <div className="top-bar">
+        <h2 className="top-bar-title">Manage Appointments</h2>
+        <button
+          className="top-bar-button"
+          onClick={() => navigate("/dashboard")}
+        >
+          Back to Dashboard
+        </button>
+      </div>
+
+      {/* Background + Appointments Section */}
+      <div
+        className="background-section"
+        style={{ backgroundImage: `url(${backgroundImage})` }}
+      >
+        <div className="table-section">
+          {/* Search Form */}
+          <form className="search-form" onSubmit={handleSearch}>
+            <input
+              type="text"
+              placeholder="Enter Appointment ID"
+              value={searchId}
+              onChange={(e) => setSearchId(e.target.value)}
+            />
+            <button type="submit">Search</button>
+          </form>
+
+          {/* Messages */}
+          {loading && <p>Loading appointments...</p>}
+          {error && <p style={{ color: "red" }}>{error}</p>}
+
+          {/* Appointments Table */}
+          {!loading && !error && (
+            <>
+              {appointments.length === 0 ? (
+                <p>No appointments found.</p>
+              ) : (
+                <div className="table-wrapper">
+                  <table className="appointment-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>User ID</th>
+                        <th>User Email</th>
+                        <th>Doctor ID</th>
+                        <th>Doctor Name</th>
+                        <th>Created At</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {appointments.map((appt) => (
+                        <tr key={appt.id}>
+                          <td>{appt.id}</td>
+                          <td>{appt.userId || "N/A"}</td>
+                          <td>{appt.userEmail || "N/A"}</td>
+                          <td>{appt.doctorId || "N/A"}</td>
+                          <td>{appt.doctorName || "N/A"}</td>
+                          <td>{formatDate(appt.createdAt)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
