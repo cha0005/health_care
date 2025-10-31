@@ -1,250 +1,84 @@
-import React, { useState } from "react";
-import "./ManageUsers.css";
-import { useNavigate } from "react-router-dom";
-import { auth } from "../firebase/firebaseConfig";
-import backgroundImage from "../assets/ref.jpg"; // background image
+import React, { useState, useEffect } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { Link, useNavigate } from "react-router-dom";
+import "./Login.css";
 
-export default function ManageUsers() {
+import img1 from "../assets/Hospital.jpg";
+import img2 from "../assets/R.jpeg";
+import img3 from "../assets/Dash.jpg";
+import img4 from "../assets/org.jpg";
+import img5 from "../assets/staff.jpeg";
+import img6 from "../assets/scan.jpeg";
+import img7 from "../assets/ref.jpg";
+
+const images = [img1,img2,img3,img4,img5,img6,img7];
+
+export default function Login() {
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImage((prev) => (prev + 1) % images.length);
+    }, 5000); // change every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const [searchId, setSearchId] = useState("");
-  const [searchName, setSearchName] = useState("");
+  // Temporary login check
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-  const [filteredUsers, setFilteredUsers] = useState(users);
-  const [showForm, setShowForm] = useState(false);
-  const [formType, setFormType] = useState("");
-  const [formData, setFormData] = useState({
-    id: "",
-    name: "",
-    email: "",
-    role: "",
-    registered: "",
-    status: "Active",
-  });
-
-  const handleSearch = () => {
-    const searchTermId = searchId.trim().toLowerCase();
-    const searchTermName = searchName.trim().toLowerCase();
-    const results = users.filter(
-      (u) =>
-        (searchTermId && u.id.toLowerCase().includes(searchTermId)) ||
-        (searchTermName && u.name.toLowerCase().includes(searchTermName))
-    );
-    if (results.length > 0) setFilteredUsers(results);
-    else {
-      alert("No user found!");
-      setFilteredUsers(users);
-    }
-  };
-
-  const handleAddUser = () => {
-    setFormType("add");
-    setFormData({
-      id: "",
-      name: "",
-      email: "",
-      role: "",
-      registered: new Date().toISOString().slice(0, 10),
-      status: "Active",
-    });
-    setShowForm(true);
-  };
-
-  const handleUpdateUser = (user) => {
-    setFormType("update");
-    setFormData(user);
-    setShowForm(true);
-  };
-
-  const handleSaveUser = () => {
-    if (!formData.id || !formData.name || !formData.email || !formData.role) {
-      alert("Please fill all fields!");
-      return;
-    }
-
-    if (formType === "add") {
-      const exists = users.some((u) => u.id === formData.id);
-      if (exists) {
-        alert("User ID already exists!");
-        return;
-      }
-      const newUsers = [...users, formData];
-      setUsers(newUsers);
-      setFilteredUsers(newUsers);
-      alert("User added successfully!");
+    // Simple dummy validation
+    if (username === "Chathuni" && password === "123456789") {
+      alert("Login successful!");
+      navigate("/dashboard"); // Redirect to dashboard
     } else {
-      const updated = users.map((u) => (u.id === formData.id ? formData : u));
-      setUsers(updated);
-      setFilteredUsers(updated);
-      alert("User updated successfully!");
+      alert("Invalid email or password!");
     }
-    setShowForm(false);
-  };
-
-  const handleDeleteUser = (id) => {
-    if (window.confirm(`Delete user ${id}?`)) {
-      const updated = users.filter((u) => u.id !== id);
-      setUsers(updated);
-      setFilteredUsers(updated);
-    }
-  };
-
-  const handleToggleStatus = (id) => {
-    const updated = users.map((u) =>
-      u.id === id
-        ? { ...u, status: u.status === "Active" ? "Inactive" : "Active" }
-        : u
-    );
-    setUsers(updated);
-    setFilteredUsers(updated);
-  };
-
-  const handleCloseForm = () => setShowForm(false);
-  const handleClearSearch = () => {
-    setSearchId("");
-    setSearchName("");
-    setFilteredUsers(users);
   };
 
   return (
     <div
-      className="manage-users-page"
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
+    className="container"
+    style={{
+      backgroundImage: `url(${images[currentImage]})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
-        minHeight: "100vh",
+        height: "100vh",
       }}
-    >
-      {/* 🟩 Top Bar */}
-      <div className="top-bar">
-        <h2>Manage User Accounts</h2>
-        <button className="back-btn" onClick={() => navigate("/Dashboard")}>
-          Back to Dashboard
-        </button>
+      >
+      <div className="top-right-title">
+      <h1 className="title">Welcome to the MedLink</h1>
       </div>
-
-      {/* 🟩 Content Below Top Bar */}
-      <div className="content-container">
-        <div className="search-section">
-          <h3>Search Users</h3>
-          <div className="search-inputs">
-            <input
-              type="text"
-              placeholder="Enter User ID"
-              value={searchId}
-              onChange={(e) => setSearchId(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="Enter Name"
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-            />
-            <button onClick={handleSearch} className="search-btn">
-              Apply
-            </button>
-            <button onClick={handleClearSearch} className="clear-btn">
-              Clear
-            </button>
-          </div>
-        </div>
-
-        <div className="user-actions">
-          <button className="add-btn" onClick={handleAddUser}>
-            Add User
-          </button>
-        </div>
-
-        <div className="user-table-container">
-          <h3>User Records</h3>
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Full Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Registered</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((u, i) => (
-                <tr key={i}>
-                  <td>{u.id}</td>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>{u.role}</td>
-                  <td>{u.registered}</td>
-                  <td className={u.status === "Active" ? "active-status" : "inactive-status"}>
-                    {u.status}
-                  </td>
-                  <td>
-                    <button className="edit-btn" onClick={() => handleUpdateUser(u)}>Edit</button>
-                    <button
-                      className={u.status === "Active" ? "deactivate-btn" : "activate-btn"}
-                      onClick={() => handleToggleStatus(u.id)}
-                    >
-                      {u.status === "Active" ? "Deactivate" : "Activate"}
-                    </button>
-                    <button className="delete-btn" onClick={() => handleDeleteUser(u.id)}>
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {showForm && (
-          <div className="user-form-popup">
-            <div className="form-container">
-              <h3>{formType === "add" ? "Add User" : "Update User"}</h3>
-              <input
-                type="text"
-                placeholder="User ID"
-                value={formData.id}
-                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
-                disabled={formType === "update"}
-              />
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-              <input
-                type="email"
-                placeholder="Email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-              <input
-                type="text"
-                placeholder="Role"
-                value={formData.role}
-                onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              />
-              <input
-                type="date"
-                value={formData.registered}
-                onChange={(e) => setFormData({ ...formData, registered: e.target.value })}
-              />
-              <div className="form-buttons">
-                <button className="save-btn" onClick={handleSaveUser}>
-                  Save
-                </button>
-                <button className="cancel-btn" onClick={handleCloseForm}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
+      <div style={{ textAlign: "center"}}>
+      <div className="Login-Container">
+        <div className="login-box">
+          <h1>Admin Login </h1>
+          <form onSubmit={handleLogin}>
+      <input type="text" placeholder="Username" value={username} onChange={(e) =>setUsername(e.target.value)}/>
+       <input type="password" placeholder="Password" value={password} onChange={(e) =>setPassword(e.target.value)}/>
+      <button type="submit">Login</button>
+      </form>
+      <p style={{marginTop:"10px", color: "White"}} >
+        Don't have an account? <Link to="/admin-register"style={{ color: "White", fontWeight: "bold", textDecoration: "none" }}>Register here</Link>
+      </p>
     </div>
+    <div className="hospital-card">
+          <h2>About Us</h2>
+          <p>
+            MedLink has been a trusted pillar of healthcare excellence for over two decades, serving the Sri Lankan community with dedication, compassion, and innovation. Our mission is to provide patient-centered care that combines advanced medical technology with personalized attention.
+We offer a comprehensive range of services including emergency care, specialized surgeries, diagnostic imaging, and preventive health programs. Our team of highly qualified doctors, nurses, and healthcare professionals work tirelessly to ensure each patient receives safe, effective, and empathetic treatment.
+At MedLink, we believe health is the foundation of a good life. That is why we continuously invest in cutting-edge facilities, state-of-the-art equipment, and ongoing staff training. We also engage actively with the community through health awareness programs, free checkups, and wellness initiatives to promote a healthier future for everyone.
+Your health is our priority — at MedLink, we donot just treat symptoms, we care for people.
+
+          </p>
+        </div>
+    </div>
+    </div>
+    
+   </div>
   );
 }
